@@ -2,5 +2,5 @@
 
 You can use crypt as a command line tool or as a configuration library:
 
-* [crypt cli](bin/README.md)
-* [crypt/config](config/README.md)
+* [crypt cli](bin)
+* [crypt/config](config)
