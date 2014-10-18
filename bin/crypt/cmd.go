@@ -17,11 +17,12 @@ func getCmd(flagset *flag.FlagSet) {
 		fmt.Fprintf(os.Stderr, "usage: %s get [args...] key\n", os.Args[0])
 		flagset.PrintDefaults()
 	}
-	flagset.StringVar(&secretKeyring, "secret-keyring", ".secring.gpg", "path to secret keyring")
+	flagset.StringVar(&secretKeyring, "secret-keyring", ".secring.gpg", "path to armored secret keyring")
 	flagset.Parse(os.Args[2:])
 	key := flagset.Arg(0)
 	if key == "" {
-		log.Fatal("a key is required")
+		flagset.Usage()
+		os.Exit(1)
 	}
 	skr, err := os.Open(secretKeyring)
 	if err != nil {
@@ -42,15 +43,17 @@ func setCmd(flagset *flag.FlagSet) {
 		fmt.Fprintf(os.Stderr, "usage: %s set [args...] key file\n", os.Args[0])
 		flagset.PrintDefaults()
 	}
-	flagset.StringVar(&keyring, "keyring", ".pubring.gpg", "path to public keyring")
+	flagset.StringVar(&keyring, "keyring", ".pubring.gpg", "path to armored public keyring")
 	flagset.Parse(os.Args[2:])
 	key := flagset.Arg(0)
 	if key == "" {
-		log.Fatal("a key is required")
+		flagset.Usage()
+		os.Exit(1)
 	}
 	data := flagset.Arg(1)
 	if data == "" {
-		log.Fatal("a data file is required")
+		flagset.Usage()
+		os.Exit(1)
 	}
 	backend := etcd.New([]string{endpoint})
 	d, err := ioutil.ReadFile(data)

@@ -19,8 +19,8 @@ var (
 )
 
 func init() {
-	flagset.StringVar(&backend, "backend", "etcd", "backend")
-	flagset.StringVar(&endpoint, "endpoint", "http://127.0.0.1:4001", "backend")
+	flagset.StringVar(&backend, "backend", "etcd", "backend provider")
+	flagset.StringVar(&endpoint, "endpoint", "http://127.0.0.1:4001", "backend url")
 }
 
 func main() {
