@@ -8,6 +8,7 @@ import (
 	"os"
 
 	"github.com/xordataexchange/crypt/backend/etcd"
+	"github.com/xordataexchange/crypt/config"
 	"github.com/xordataexchange/crypt/encoding/secconf"
 )
 
@@ -30,9 +31,10 @@ func init() {
 func main() {
 	flag.Parse()
 	cmd := flag.Arg(0)
-	backend := etcd.New([]string{"http://127.0.0.1:4001"})
+	machines := []string{"http://127.0.0.1:4001"}
 	switch cmd {
 	case "set":
+		backend := etcd.New(machines)
 		config, err := ioutil.ReadFile(data)
 		if err != nil {
 			log.Fatal(err)
@@ -50,17 +52,13 @@ func main() {
 			log.Fatal(err)
 		}
 	case "get":
-		v, err := backend.Get(key)
-		if err != nil {
-			log.Fatal(err)
-		}
 		skr, err := os.Open(secretKeyring)
 		if err != nil {
 			log.Fatal(err)
 		}
 		defer skr.Close()
-		secureValue := []byte(v)
-		value, err := secconf.Decode(secureValue, skr)
+		cm := config.NewEtcdConfigManager(machines, skr)
+		value, err := cm.Get(key)
 		if err != nil {
 			log.Fatal(err)
 		}
