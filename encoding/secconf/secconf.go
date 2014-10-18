@@ -22,8 +22,8 @@ func Decode(data []byte, secertKeyring io.Reader) ([]byte, error) {
 	}
 	gzReader, err := gzip.NewReader(md.UnverifiedBody)
 	if err != nil {
-        return nil, err
-    }
+		return nil, err
+	}
 	defer gzReader.Close()
 	bytes, err := ioutil.ReadAll(gzReader)
 	if err != nil {
