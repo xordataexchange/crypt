@@ -32,7 +32,7 @@ Expire-Date: 0
 Run the following command:
 
 ```
-gpg2 --batch --gen-key app.batch
+gpg2 --batch --armor --gen-key app.batch
 ```
 
 You should now have two keyrings, `.pubring.gpg` which contains the public keys, and `.secring.gpg` which contains the private keys.

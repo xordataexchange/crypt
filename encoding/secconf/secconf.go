@@ -12,7 +12,7 @@ import (
 
 func Decode(data []byte, secertKeyring io.Reader) ([]byte, error) {
 	decoder := base64.NewDecoder(base64.StdEncoding, bytes.NewBuffer(data))
-	entityList, err := openpgp.ReadKeyRing(secertKeyring)
+	entityList, err := openpgp.ReadArmoredKeyRing(secertKeyring)
 	if err != nil {
 		return nil, err
 	}
@@ -33,7 +33,7 @@ func Decode(data []byte, secertKeyring io.Reader) ([]byte, error) {
 }
 
 func Encode(data []byte, keyring io.Reader) ([]byte, error) {
-	entityList, err := openpgp.ReadKeyRing(keyring)
+	entityList, err := openpgp.ReadArmoredKeyRing(keyring)
 	if err != nil {
 		return nil, err
 	}
