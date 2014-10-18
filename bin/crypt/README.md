@@ -6,6 +6,10 @@
 go install github.com/xordataexchange/crypt/bin/crypt
 ```
 
+## Backends
+
+crypt supports etcd and consul as backends via the `-backend` flag.
+
 ## Usage
 
 ```
