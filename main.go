@@ -3,67 +3,47 @@ package main
 import (
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
-
-	"github.com/xordataexchange/crypt/backend/etcd"
-	"github.com/xordataexchange/crypt/config"
-	"github.com/xordataexchange/crypt/encoding/secconf"
 )
+
+var flagset = flag.NewFlagSet("crypt", flag.ExitOnError)
 
 var (
 	data          string
 	backend       string
 	key           string
 	keyring       string
+	endpoint      string
 	secretKeyring string
 )
 
 func init() {
-	flag.StringVar(&backend, "backend", "", "backend")
-	flag.StringVar(&data, "data", "", "path to configuration file")
-	flag.StringVar(&key, "key", "", "configuration key")
-	flag.StringVar(&keyring, "keyring", ".pubring.gpg", "path to public keyring")
-	flag.StringVar(&secretKeyring, "secret-keyring", ".secring.gpg", "path to secret keyring")
+	flagset.StringVar(&backend, "backend", "etcd", "backend")
+	flagset.StringVar(&endpoint, "endpoint", "http://127.0.0.1:4001", "backend")
 }
 
 func main() {
-	flag.Parse()
-	cmd := flag.Arg(0)
-	machines := []string{"http://127.0.0.1:4001"}
+	log.SetFlags(0)
+	if len(os.Args) < 2 {
+		help()
+	}
+	cmd := os.Args[1]
 	switch cmd {
 	case "set":
-		backend := etcd.New(machines)
-		config, err := ioutil.ReadFile(data)
-		if err != nil {
-			log.Fatal(err)
-		}
-		kr, err := os.Open(keyring)
-		if err != nil {
-			log.Fatal(err)
-		}
-		defer kr.Close()
-		secureValue, err := secconf.Encode(config, kr)
-		if err != nil {
-			log.Fatal(err)
-		}
-		if err := backend.Set(key, secureValue); err != nil {
-			log.Fatal(err)
-		}
+		setCmd(flagset)
 	case "get":
-		skr, err := os.Open(secretKeyring)
-		if err != nil {
-			log.Fatal(err)
-		}
-		defer skr.Close()
-		cm := config.NewEtcdConfigManager(machines, skr)
-		value, err := cm.Get(key)
-		if err != nil {
-			log.Fatal(err)
-		}
-		fmt.Printf("%s\n", value)
+		getCmd(flagset)
 	default:
-		log.Fatal("unknown command: ", cmd)
+		help()
 	}
+}
+
+func help() {
+	fmt.Fprintf(os.Stderr, "usage: %s COMMAND [arg...]", os.Args[0])
+	fmt.Fprintf(os.Stderr, "\n\n")
+	fmt.Fprintf(os.Stderr, "commands:\n")
+	fmt.Fprintf(os.Stderr, "   get  retrieve the value of a key\n")
+	fmt.Fprintf(os.Stderr, "   set  set the value of a key\n")
+	os.Exit(1)
 }
