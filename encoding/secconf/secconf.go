@@ -1,3 +1,8 @@
+// Package secconf implements secconf encoding as specified in the following
+// format:
+//
+//   base64(gpg(gzip(data)))
+//
 package secconf
 
 import (
@@ -10,6 +15,7 @@ import (
 	"code.google.com/p/go.crypto/openpgp"
 )
 
+// Deocde decodes data using the secconf codec.
 func Decode(data []byte, secertKeyring io.Reader) ([]byte, error) {
 	decoder := base64.NewDecoder(base64.StdEncoding, bytes.NewBuffer(data))
 	entityList, err := openpgp.ReadArmoredKeyRing(secertKeyring)
@@ -32,6 +38,8 @@ func Decode(data []byte, secertKeyring io.Reader) ([]byte, error) {
 	return bytes, nil
 }
 
+// Encode encodes data to a base64 encoded using the secconf codec.
+// data is encrypted with all public keys found in the supplied keyring.
 func Encode(data []byte, keyring io.Reader) ([]byte, error) {
 	entityList, err := openpgp.ReadArmoredKeyRing(keyring)
 	if err != nil {
