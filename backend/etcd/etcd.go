@@ -8,8 +8,8 @@ type Client struct {
 	client *goetcd.Client
 }
 
-func New(machines []string) *Client {
-	return &Client{goetcd.NewClient(machines)}
+func New(machines []string) (*Client, error) {
+	return &Client{goetcd.NewClient(machines)}, nil
 }
 
 func (c *Client) Get(key string) ([]byte, error) {

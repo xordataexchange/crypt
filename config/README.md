@@ -19,13 +19,16 @@ var (
 )
 
 func main() {
-	skr, err := os.Open(secretKeyring)
+	kr, err := os.Open(secretKeyring)
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer skr.Close()
+	defer kr.Close()
 	machines := []string{"http://127.0.0.1:4001"}
-	cm := config.NewEtcdConfigManager(machines, skr)
+	cm, err := config.NewEtcdConfigManager(machines, kr)
+	if err != nil {
+        log.Fatal(err)
+    }
 	value, err := cm.Get(key)
 	if err != nil {
 		log.Fatal(err)

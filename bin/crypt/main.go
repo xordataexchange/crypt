@@ -11,16 +11,17 @@ var flagset = flag.NewFlagSet("crypt", flag.ExitOnError)
 
 var (
 	data          string
-	backend       string
+	backendName   string
 	key           string
 	keyring       string
 	endpoint      string
 	secretKeyring string
+	machines      []string
 )
 
 func init() {
-	flagset.StringVar(&backend, "backend", "etcd", "backend provider")
-	flagset.StringVar(&endpoint, "endpoint", "http://127.0.0.1:4001", "backend url")
+	flagset.StringVar(&backendName, "backend", "etcd", "backend provider")
+	flagset.StringVar(&endpoint, "endpoint", "", "backend url")
 }
 
 func main() {

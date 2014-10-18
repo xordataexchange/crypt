@@ -1,14 +1,16 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
 
+	"github.com/xordataexchange/crypt/backend"
+	"github.com/xordataexchange/crypt/backend/consul"
 	"github.com/xordataexchange/crypt/backend/etcd"
-	"github.com/xordataexchange/crypt/config"
 	"github.com/xordataexchange/crypt/encoding/secconf"
 )
 
@@ -24,14 +26,20 @@ func getCmd(flagset *flag.FlagSet) {
 		flagset.Usage()
 		os.Exit(1)
 	}
-	skr, err := os.Open(secretKeyring)
+	backendStore, err := getBackendStore(backendName, endpoint)
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer skr.Close()
-	machines := []string{endpoint}
-	cm := config.NewEtcdConfigManager(machines, skr)
-	value, err := cm.Get(key)
+	kr, err := os.Open(secretKeyring)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer kr.Close()
+	data, err := backendStore.Get(key)
+	if err != nil {
+		log.Fatal(err)
+	}
+	value, err := secconf.Decode(data, kr)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -55,7 +63,10 @@ func setCmd(flagset *flag.FlagSet) {
 		flagset.Usage()
 		os.Exit(1)
 	}
-	backend := etcd.New([]string{endpoint})
+	backendStore, err := getBackendStore(backendName, endpoint)
+	if err != nil {
+		log.Fatal(err)
+	}
 	d, err := ioutil.ReadFile(data)
 	if err != nil {
 		log.Fatal(err)
@@ -69,7 +80,27 @@ func setCmd(flagset *flag.FlagSet) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	if err := backend.Set(key, secureValue); err != nil {
+	if err := backendStore.Set(key, secureValue); err != nil {
 		log.Fatal(err)
+	}
+}
+
+func getBackendStore(provider string, endpoint string) (backend.Store, error) {
+	if endpoint == "" {
+		switch provider {
+		case "consul":
+			endpoint = "127.0.0.1:8500"
+		case "etcd":
+			endpoint = "http://127.0.0.1:4001"
+		}
+	}
+	machines := []string{endpoint}
+	switch provider {
+	case "etcd":
+		return etcd.New(machines)
+	case "consul":
+		return consul.New(machines)
+	default:
+		return nil, errors.New("invalid backend " + provider)
 	}
 }
