@@ -23,8 +23,8 @@ Name-Real: app
 Name-Comment: app configuration key
 Name-Email: app@example.com
 Expire-Date: 0
-%pubring pubring.gpg
-%secring secring.gpg
+%pubring .pubring.gpg
+%secring .secring.gpg
 %commit
 %echo done
 ```
@@ -35,6 +35,6 @@ Run the following command:
 gpg2 --batch --gen-key app.batch
 ```
 
-You should now have two keyrings, `pubring.gpg` which contains the public keys, and `secring.gpg` which contains the private keys.
+You should now have two keyrings, `.pubring.gpg` which contains the public keys, and `.secring.gpg` which contains the private keys.
 
 > Note the private key is not protected by a passphrase.
