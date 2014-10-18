@@ -1,5 +1,11 @@
 # crypt
 
+## Install
+
+```
+go install github.com/xordataexchange/crypt/bin/crypt
+```
+
 ## Usage
 
 ```
