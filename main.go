@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/xordataexchange/crypt/backend/etcd"
 	"github.com/xordataexchange/crypt/encoding/secconf"
 )
 
@@ -26,11 +27,10 @@ func init() {
 	flag.StringVar(&secretKeyring, "secret-keyring", ".secring.gpg", "path to secret keyring")
 }
 
-var v = `wcBMA4vc/EzjLNNYAQgABXwWihzAYHtI7rFebu11NjsOhwsGhzHBAq0tJwHQGi7gCaz92ZOOA1e/1/GD7ZqRgskKqJd1KnMHvedYVRJbx0AriTouXICMSSpN9Q93GsXY6r7iVaozCCIAkW5YvTDwJ1/wkG9TMduoiflKglbV9LMBRObOb566FvGSlwivOF1eNYxQDbqUpaUXaw9QqQ9P/lRBho3J8Pn6Eg11dTclR9yirrc0IrnL7rBNZbZwC73ysVd3Oi7ZV24hPrDwld1zkoqMeoZQ0VuEF7W0tWmkOCVhQFuZO3xGtmeOnoCLXPMepeOHGlJCXsEAsjxcJUz0+x2hltfUqE0ld39AcUEGRNLgAeSBGfxTcDTbE15JSuaKXB3E4aZA4KXgv+FTD+Bn4iOsOLPgdeNIUS1vqKLU+eCK4e434ALlnw8qd3utvTbyxSb9zgOsbgVBxOBcoVIGz6g28yIPK+rgA+Qe8IE42t75mW+7G9oHatiS4IbilNgmBODB4U754Bfiv4mnGuCe4+enJLoAQp7K4NfkQxZ38e0ZkluHixQ34YWTgOJaj+vJ4Y/HAA==`
-
 func main() {
 	flag.Parse()
-	cmd := "get"
+	cmd := flag.Arg(0)
+	backend := etcd.New([]string{"http://127.0.0.1:4001"})
 	switch cmd {
 	case "set":
 		config, err := ioutil.ReadFile(data)
@@ -46,9 +46,14 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		fmt.Printf("secure value: \n%s\n", secureValue)
-		return
+		if err := backend.Set(key, secureValue); err != nil {
+			log.Fatal(err)
+		}
 	case "get":
+		v, err := backend.Get(key)
+		if err != nil {
+			log.Fatal(err)
+		}
 		skr, err := os.Open(secretKeyring)
 		if err != nil {
 			log.Fatal(err)
@@ -59,7 +64,7 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		fmt.Printf("value: \n%s\n", value)
+		fmt.Printf("%s\n", value)
 	default:
 		log.Fatal("unknown command: ", cmd)
 	}
