@@ -66,7 +66,7 @@ You have passwords and usernames hard coded in your apps.  You have IP addresses
 <h2>
 <a name="generating-gpg-keys-and-keyrings" class="anchor" href="#generating-gpg-keys-and-keyrings"><span class="octicon octicon-link"></span></a>Generating gpg keys and keyrings</h2>
 
-<p>The crypt cli and config package require gpg keyrings.  Read about them <a href="https://www.gnupg.org/gph/en/manual.html">here</a> before you blindly follow a tutorial written by someone you don't know and shouldn't trust.</p>
+<p>The crypt cli and config package require gpg keyrings.  ** Read about them <a href="https://www.gnupg.org/gph/en/manual.html">here</a> before you blindly follow a tutorial written by someone you don't know and shouldn't trust. **</p>
 
 <h3>
 <a name="create-a-key-and-keyring-from-a-batch-file" class="anchor" href="#create-a-key-and-keyring-from-a-batch-file"><span class="octicon octicon-link"></span></a>Create a key and keyring from a batch file</h3>
@@ -97,6 +97,98 @@ Expire-Date: 0
 <blockquote>
 <p>Note the private key is not protected by a passphrase.</p>
 </blockquote>
+
+<h2>
+<a name="create-a-configuration-key" class="anchor" href="#create-a-configuration-key"><span class="octicon octicon-link"></span></a>Create a configuration key</h2>
+
+<p>You can encrypt a single value, or an entire configuration file.  <code>crypt</code> will read the contents of the file you specify and encrypt it, then store it in your data store.</p>
+
+<p>** Keep your configuration values atomic ***
+Don't set the database username in one key and the password in another key.  Most k/v stores don't support transactions, so you might get the change to one, but not the other.  Instead, keep related configurations together in a single file, and write/read them atomically.</p>
+
+<p>Here's how to encrypt a file called <code>config.json</code> and store it at /myapp/config in etcd:</p>
+
+<pre><code>crypt set -backend etcd -endpoint http://127.0.0.1:4001 -keyring pubring.gpg /myapp/config config.json 
+</code></pre>
+
+<p>To retrieve it on the command line:</p>
+
+<pre><code>crypt set -backend etcd -endpoint http://127.0.0.1:4001 -keyring pubring.gpg &gt; config.json
+</code></pre>
+
+<p>Or inside your application:</p>
+
+<pre><code>package main
+
+import (
+    "fmt"
+    "log"
+    "os"
+
+    "github.com/xordataexchange/crypt/config"
+)
+
+var (
+    key           = "/myapp/config"
+    secretKeyring = ".secring.gpg"
+)
+
+func main() {
+    kr, err := os.Open(secretKeyring)
+    if err != nil {
+        log.Fatal(err)
+    }
+    defer kr.Close()
+    machines := []string{"http://127.0.0.1:4001"}
+    cm, err := config.NewEtcdConfigManager(machines, kr)
+    if err != nil {
+        log.Fatal(err)
+    }
+    value, err := cm.Get(key)
+    if err != nil {
+        log.Fatal(err)
+    }
+    // now use the data
+    //fmt.Printf("%s\n", value)
+    // var config MyConfigStruct
+    // err := json.Unmarshal(value, &amp;config)
+}
+</code></pre>
+
+<h3>
+<a name="security-note" class="anchor" href="#security-note"><span class="octicon octicon-link"></span></a>Security Note</h3>
+
+<p>Remember your data is only as secure as your private key.  Do some research and figure out a safe and secure way to keep your key away.</p>
+
+<h2>
+<a name="contributing" class="anchor" href="#contributing"><span class="octicon octicon-link"></span></a>Contributing</h2>
+
+<p>We'll happily accept contributions for new storage backends (mongodb?) and link to library implementations in other languages.  Fork, and send a clean PR in a new branch.  </p>
+
+<h2>
+<a name="license" class="anchor" href="#license"><span class="octicon octicon-link"></span></a>License</h2>
+
+<p>The MIT License (MIT)</p>
+
+<p>Copyright (c) 2014 XOR Data Exchange, Inc.</p>
+
+<p>Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:</p>
+
+<p>The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.</p>
+
+<p>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.</p>
       </section>
     </div>
 
