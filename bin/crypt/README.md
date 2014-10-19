@@ -10,7 +10,7 @@ mv crypt-0.0.1-linux-amd64 /usr/local/bin/crypt
 chmod +x /usr/local/bin/crypt
 ```
 
-### go get
+### go install
 
 ```
 go install github.com/xordataexchange/crypt/bin/crypt
