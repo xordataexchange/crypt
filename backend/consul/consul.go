@@ -2,6 +2,7 @@ package consul
 
 import (
 	"strings"
+	"time"
 
 	"github.com/xordataexchange/crypt/backend"
 
@@ -9,7 +10,8 @@ import (
 )
 
 type Client struct {
-	client *consulapi.KV
+	client    *consulapi.KV
+	waitIndex uint64
 }
 
 func New(machines []string) (*Client, error) {
@@ -21,7 +23,7 @@ func New(machines []string) (*Client, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &Client{client.KV()}, nil
+	return &Client{client.KV(), 0}, nil
 }
 
 func (c *Client) Get(key string) ([]byte, error) {
@@ -44,5 +46,20 @@ func (c *Client) Set(key string, value []byte) error {
 
 func (c *Client) Watch(key string, stop chan bool) <-chan *backend.Response {
 	respChan := make(chan *backend.Response, 0)
+	go func() {
+		for {
+			opts := consulapi.QueryOptions{
+				WaitIndex: c.waitIndex,
+			}
+			keypair, meta, err := c.client.Get(key, &opts)
+			if err != nil {
+				respChan <- &backend.Response{nil, err}
+				time.Sleep(time.Second * 5)
+				continue
+			}
+			c.waitIndex = meta.LastIndex
+			respChan <- &backend.Response{keypair.Value, nil}
+		}
+	}()
 	return respChan
 }
