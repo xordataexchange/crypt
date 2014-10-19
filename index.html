@@ -31,32 +31,54 @@
     <!-- MAIN CONTENT -->
     <div id="main_content_wrap" class="outer">
       <section id="main_content" class="inner">
-        <h1>
+        <p><strong>Fess up.</strong>
+You have passwords and usernames hard coded in your apps.  You have IP addresses checked in to your source code repository.  You have entire configuration files that were created by the developer who wrote the app and haven't been changed since she typed <code>git init</code>. </p>
+
+<h1>
 <a name="crypt" class="anchor" href="#crypt"><span class="octicon octicon-link"></span></a>crypt</h1>
+
+<p><code>crypt</code> is here to lead you back to the Path of Enlightened Configuration.  Store encrypted configuration values in <a href="https://github.com/coreos/etcd">etcd</a> or <a href="http://www.consul.io/">consul</a> using a command line application.</p>
+
+<p>Decrypt them before starting your application using a wrapper script and the handy CLI tool, or inside the app using the <code>crypt/config</code> library.</p>
+
+<h2>
+<a name="standards" class="anchor" href="#standards"><span class="octicon octicon-link"></span></a>Standards</h2>
+
+<p><code>crypt</code> is built on time-tested standards like OpenPGP, base64, and gzip.  Your data is encrypted using public key encryption, and can only be decrypted by when the private key is available.  After encryption, it is gzip'd, and base64 encoded so it can be stored in your key/value store of choice.  We support etcd and consul out of the box, but adding other storage tools is a trivial task, thanks to Go's interfaces.</p>
+
+<h2>
+<a name="how-it-works" class="anchor" href="#how-it-works"><span class="octicon octicon-link"></span></a>How it works</h2>
+
+<p><code>crypt</code> encrypts, compresses, then encodes your value for storage, then puts it at the location you specify on your key/value store.  To encrypt, you'll need access to one or more public keys.</p>
+
+<p>In order to decrypt a value, your application will need access to the private key.  We recommend putting the private key on the server and protecting it with standard host level security.  Then make sure your application runs under the context of a named user on your system, and that user is the only user with access to the private key(ring).  If you're running within Docker, just mount a volume from the directory with the private key.  ** Don't put your private key in your Docker container.  Seriously.  Just don't. **</p>
+
+<h2>
+<a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>Usage</h2>
 
 <p>You can use crypt as a command line tool or as a configuration library:</p>
 
 <ul>
-<li><a href="bin/crypt">crypt cli</a></li>
-<li><a href="config">crypt/config</a></li>
+<li><a href="https://github.com/xordataexchange/crypt/tree/master/bin/crypt">crypt cli</a></li>
+<li><a href="https://github.com/xordataexchange/crypt/tree/master/config">crypt/config</a></li>
 </ul>
 
 <h2>
 <a name="generating-gpg-keys-and-keyrings" class="anchor" href="#generating-gpg-keys-and-keyrings"><span class="octicon octicon-link"></span></a>Generating gpg keys and keyrings</h2>
 
-<p>The crypt cli and config package require gpg keyrings. </p>
+<p>The crypt cli and config package require gpg keyrings.  Read about them <a href="https://www.gnupg.org/gph/en/manual.html">here</a> before you blindly follow a tutorial written by someone you don't know and shouldn't trust.</p>
 
 <h3>
 <a name="create-a-key-and-keyring-from-a-batch-file" class="anchor" href="#create-a-key-and-keyring-from-a-batch-file"><span class="octicon octicon-link"></span></a>Create a key and keyring from a batch file</h3>
 
-<pre><code>vim app.batch
+<pre><code>vim myapp.batch
 </code></pre>
 
 <pre><code>%echo Generating a configuration OpenPGP key
 Key-Type: default
 Subkey-Type: default
-Name-Real: app
-Name-Comment: app configuration key
+Name-Real: myapp
+Name-Comment: myapp configuration key
 Name-Email: app@example.com
 Expire-Date: 0
 %pubring .pubring.gpg
@@ -67,10 +89,10 @@ Expire-Date: 0
 
 <p>Run the following command:</p>
 
-<pre><code>gpg2 --batch --armor --gen-key app.batch
+<pre><code>gpg2 --batch --armor --gen-key myapp.batch
 </code></pre>
 
-<p>You should now have two keyrings, <code>.pubring.gpg</code> which contains the public keys, and <code>.secring.gpg</code> which contains the private keys.</p>
+<p>You should now have two keyrings, <code>.pubring.gpg</code> which contains the public keys, and <code>.secring.gpg</code> which contains the private keys.  This is a place where you can get fancy -- create different keyrings for different environments.  Make one for your production environment that the developers don't have access too.  Remember <a href="http://www.sans.edu/research/security-laboratory/article/it-separation-duties">separation of duties</a> to keep your data safe.</p>
 
 <blockquote>
 <p>Note the private key is not protected by a passphrase.</p>
@@ -86,7 +108,17 @@ Expire-Date: 0
       </footer>
     </div>
 
-    
+              <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-55882461-1");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
 
   </body>
 </html>
