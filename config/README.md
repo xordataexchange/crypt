@@ -2,6 +2,8 @@
 
 ## Usage
 
+### Get configuration from a backend
+
 ```
 package main
 
@@ -37,7 +39,7 @@ func main() {
 }
 ```
 
-The crypt/config package also support watches
+### Monitor backend for configuration changes
 
 ```
 package main
