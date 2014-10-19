@@ -1,7 +1,9 @@
 package config
 
 import (
+	"bytes"
 	"io"
+	"io/ioutil"
 
 	"github.com/xordataexchange/crypt/backend"
 	"github.com/xordataexchange/crypt/backend/consul"
@@ -9,13 +11,14 @@ import (
 	"github.com/xordataexchange/crypt/encoding/secconf"
 )
 
-// A ConfigManager retrieves and decrypts configuration from a key/value store. 
+// A ConfigManager retrieves and decrypts configuration from a key/value store.
 type ConfigManager interface {
 	Get(key string) ([]byte, error)
+	Watch(key string, stop chan bool) <-chan *Response
 }
 
 type configManager struct {
-	keystore io.Reader
+	keystore []byte
 	store    backend.Store
 }
 
@@ -25,7 +28,11 @@ func NewEtcdConfigManager(machines []string, keystore io.Reader) (ConfigManager,
 	if err != nil {
 		return nil, err
 	}
-	return configManager{keystore, store}, nil
+	bytes, err := ioutil.ReadAll(keystore)
+	if err != nil {
+		return nil, err
+	}
+	return configManager{bytes, store}, nil
 }
 
 // NewConsulConfigManager returns a new ConfigManager backed by consul.
@@ -34,7 +41,11 @@ func NewConsulConfigManager(machines []string, keystore io.Reader) (ConfigManage
 	if err != nil {
 		return nil, err
 	}
-	return configManager{keystore, store}, nil
+	bytes, err := ioutil.ReadAll(keystore)
+	if err != nil {
+		return nil, err
+	}
+	return configManager{bytes, store}, nil
 }
 
 // Get retrieves and decodes a secconf value stored at key.
@@ -43,5 +54,31 @@ func (c configManager) Get(key string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	return secconf.Decode(value, c.keystore)
+	return secconf.Decode(value, bytes.NewBuffer(c.keystore))
+}
+
+type Response struct {
+	Value []byte
+	Error error
+}
+
+func (c configManager) Watch(key string, stop chan bool) <-chan *Response {
+	resp := make(chan *Response, 0)
+	backendResp := c.store.Watch(key, stop)
+	go func() {
+		for {
+			select {
+			case <-stop:
+				return
+			case r := <-backendResp:
+				if r.Error != nil {
+					resp <- &Response{nil, r.Error}
+					continue
+				}
+				value, err := secconf.Decode(r.Value, bytes.NewBuffer(c.keystore))
+				resp <- &Response{value, err}
+			}
+		}
+	}()
+	return resp
 }

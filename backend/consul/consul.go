@@ -3,6 +3,8 @@ package consul
 import (
 	"strings"
 
+	"github.com/xordataexchange/crypt/backend"
+
 	"github.com/armon/consul-api"
 )
 
@@ -38,4 +40,9 @@ func (c *Client) Set(key string, value []byte) error {
 	}
 	_, err := c.client.Put(kv, nil)
 	return err
+}
+
+func (c *Client) Watch(key string, stop chan bool) <-chan *backend.Response {
+	respChan := make(chan *backend.Response, 0)
+	return respChan
 }
