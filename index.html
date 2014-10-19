@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="description" content="Crypt : Store and retrieve encrypted configuration parameters from etcd or consul">
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Crypt</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/xordataexchange/crypt">View on GitHub</a>
+
+          <h1 id="project_title">Crypt</h1>
+          <h2 id="project_tagline">Store and retrieve encrypted configuration parameters from etcd or consul</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/xordataexchange/crypt/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/xordataexchange/crypt/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>
+<a name="crypt" class="anchor" href="#crypt"><span class="octicon octicon-link"></span></a>crypt</h1>
+
+<p>You can use crypt as a command line tool or as a configuration library:</p>
+
+<ul>
+<li><a href="bin/crypt">crypt cli</a></li>
+<li><a href="config">crypt/config</a></li>
+</ul>
+
+<h2>
+<a name="generating-gpg-keys-and-keyrings" class="anchor" href="#generating-gpg-keys-and-keyrings"><span class="octicon octicon-link"></span></a>Generating gpg keys and keyrings</h2>
+
+<p>The crypt cli and config package require gpg keyrings. </p>
+
+<h3>
+<a name="create-a-key-and-keyring-from-a-batch-file" class="anchor" href="#create-a-key-and-keyring-from-a-batch-file"><span class="octicon octicon-link"></span></a>Create a key and keyring from a batch file</h3>
+
+<pre><code>vim app.batch
+</code></pre>
+
+<pre><code>%echo Generating a configuration OpenPGP key
+Key-Type: default
+Subkey-Type: default
+Name-Real: app
+Name-Comment: app configuration key
+Name-Email: app@example.com
+Expire-Date: 0
+%pubring .pubring.gpg
+%secring .secring.gpg
+%commit
+%echo done
+</code></pre>
+
+<p>Run the following command:</p>
+
+<pre><code>gpg2 --batch --armor --gen-key app.batch
+</code></pre>
+
+<p>You should now have two keyrings, <code>.pubring.gpg</code> which contains the public keys, and <code>.secring.gpg</code> which contains the private keys.</p>
+
+<blockquote>
+<p>Note the private key is not protected by a passphrase.</p>
+</blockquote>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Crypt maintained by <a href="https://github.com/xordataexchange">xordataexchange</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
