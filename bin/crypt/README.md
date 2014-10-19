@@ -2,6 +2,16 @@
 
 ## Install
 
+### Binary release
+
+```
+wget https://github.com/xordataexchange/crypt/releases/download/v0.0.1/crypt-0.0.1-linux-amd64
+mv crypt-0.0.1-linux-amd64 /usr/local/bin/crypt
+chmod +x /usr/local/bin/crypt
+```
+
+### go get
+
 ```
 go install github.com/xordataexchange/crypt/bin/crypt
 ```
