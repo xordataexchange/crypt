@@ -1,14 +1,15 @@
-Watch Kelsey explain `crypt` in this quick 5 minute video:
-
-[![Crypt Demonstration Video](https://img.youtube.com/vi/zYpqqfuGwW8/0.jpg)](https://www.youtube.com/watch?v=zYpqqfuGwW8)
-
-
 # crypt
 
 You can use crypt as a command line tool or as a configuration library:
 
 * [crypt cli](bin/crypt)
 * [crypt/config](config)
+
+## Demo
+
+Watch Kelsey explain `crypt` in this quick 5 minute video:
+
+[![Crypt Demonstration Video](https://img.youtube.com/vi/zYpqqfuGwW8/0.jpg)](https://www.youtube.com/watch?v=zYpqqfuGwW8)
 
 ## Generating gpg keys and keyrings
 
