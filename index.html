@@ -47,7 +47,7 @@ You have passwords and usernames hard coded in your apps.  You have IP addresses
 <h2>
 <a name="standards" class="anchor" href="#standards"><span class="octicon octicon-link"></span></a>Standards</h2>
 
-<p><code>crypt</code> is built on time-tested standards like OpenPGP, base64, and gzip.  Your data is encrypted using public key encryption, and can only be decrypted by when the private key is available.  After encryption, it is gzip'd, and base64 encoded so it can be stored in your key/value store of choice.  We support etcd and consul out of the box, but adding other storage tools is a trivial task, thanks to Go's interfaces.</p>
+<p><code>crypt</code> is built on time-tested standards like OpenPGP, base64, and gzip.  Your data is encrypted using public key encryption, and can only be decrypted by when the private key is available.  After compression, it is encrypted, and base64 encoded so it can be stored in your key/value store of choice.  We support etcd and consul out of the box, but adding other storage tools is a trivial task, thanks to Go's interfaces.</p>
 
 <h2>
 <a name="how-it-works" class="anchor" href="#how-it-works"><span class="octicon octicon-link"></span></a>How it works</h2>
