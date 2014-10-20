@@ -1,3 +1,4 @@
+// Package backend provides the K/V store interface for crypt backends.
 package backend
 
 // Response represents a response from a backend store.
