@@ -52,7 +52,7 @@ You have passwords and usernames hard coded in your apps.  You have IP addresses
 <h2>
 <a name="how-it-works" class="anchor" href="#how-it-works"><span class="octicon octicon-link"></span></a>How it works</h2>
 
-<p><code>crypt</code> encrypts, compresses, then encodes your value for storage, then puts it at the location you specify on your key/value store.  To encrypt, you'll need access to one or more public keys.</p>
+<p><code>crypt</code> compresses, encrypts, then encodes your value for storage, then puts it at the location you specify on your key/value store.  To encrypt, you'll need access to one or more public keys.</p>
 
 <p>In order to decrypt a value, your application will need access to the private key.  We recommend putting the private key on the server and protecting it with standard host level security.  Then make sure your application runs under the context of a named user on your system, and that user is the only user with access to the private key(ring).  If you're running within Docker, just mount a volume from the directory with the private key.  ** Don't put your private key in your Docker container.  Seriously.  Just don't. **</p>
 
