@@ -1,3 +1,8 @@
+Watch Kelsey explain `crypt` in this quick 5 minute video:
+
+[![Crypt Demonstration Video](http://img.youtube.com/vi/zYpqqfuGwW8/0.jpg)](https://www.youtube.com/watch?v=zYpqqfuGwW8&list=UUpoYiy3kgOBELDOwIDEdnpg)
+
+
 # crypt
 
 You can use crypt as a command line tool or as a configuration library:
