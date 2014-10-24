@@ -12,6 +12,7 @@ import (
 	"github.com/xordataexchange/crypt/backend/consul"
 	"github.com/xordataexchange/crypt/backend/etcd"
 	"github.com/xordataexchange/crypt/encoding/secconf"
+	"github.com/xordataexchange/crypt/encoding/standard"
 )
 
 func getCmd(flagset *flag.FlagSet) {
@@ -30,20 +31,52 @@ func getCmd(flagset *flag.FlagSet) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	kr, err := os.Open(secretKeyring)
-	if err != nil {
-		log.Fatal(err)
+	if plaintext {
+		value, err := getPlain(key, backendStore)
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Printf("%s\n", value)
+		return
 	}
-	defer kr.Close()
-	data, err := backendStore.Get(key)
-	if err != nil {
-		log.Fatal(err)
-	}
-	value, err := secconf.Decode(data, kr)
+	value, err := getEncrypted(key, secretKeyring, backendStore)
+
 	if err != nil {
 		log.Fatal(err)
 	}
 	fmt.Printf("%s\n", value)
+}
+
+func getEncrypted(key, keyring string, store backend.Store) ([]byte, error) {
+	var value []byte
+	kr, err := os.Open(secretKeyring)
+	if err != nil {
+		return value, err
+	}
+	defer kr.Close()
+	data, err := store.Get(key)
+	if err != nil {
+		return value, err
+	}
+	value, err = secconf.Decode(data, kr)
+	if err != nil {
+		return value, err
+	}
+	return value, err
+
+}
+
+func getPlain(key string, store backend.Store) ([]byte, error) {
+	var value []byte
+	data, err := store.Get(key)
+	if err != nil {
+		return value, err
+	}
+	value, err = standard.Decode(data)
+	if err != nil {
+		return value, err
+	}
+	return value, err
 }
 
 func setCmd(flagset *flag.FlagSet) {
@@ -71,18 +104,43 @@ func setCmd(flagset *flag.FlagSet) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	kr, err := os.Open(keyring)
+
+	if plaintext {
+		err := setPlain(key, backendStore, d)
+		if err != nil {
+			log.Fatal(err)
+			return
+		}
+	}
+	err = setEncrypted(key, keyring, d, backendStore)
 	if err != nil {
 		log.Fatal(err)
+	}
+	return
+
+}
+func setPlain(key string, store backend.Store, d []byte) error {
+	value, err := standard.Encode(d)
+	if err != nil {
+		return err
+	}
+	err = store.Set(key, value)
+	return err
+
+}
+
+func setEncrypted(key, keyring string, d []byte, store backend.Store) error {
+	kr, err := os.Open(keyring)
+	if err != nil {
+		return err
 	}
 	defer kr.Close()
 	secureValue, err := secconf.Encode(d, kr)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
-	if err := backendStore.Set(key, secureValue); err != nil {
-		log.Fatal(err)
-	}
+	err = store.Set(key, secureValue)
+	return err
 }
 
 func getBackendStore(provider string, endpoint string) (backend.Store, error) {
