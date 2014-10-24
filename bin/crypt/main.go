@@ -16,6 +16,7 @@ var (
 	keyring       string
 	endpoint      string
 	secretKeyring string
+	plaintext     bool
 	machines      []string
 )
 
@@ -35,10 +36,6 @@ func main() {
 		setCmd(flagset)
 	case "get":
 		getCmd(flagset)
-	case "setplain":
-		setPlainCmd(flagset)
-	case "getplain":
-		getPlainCmd(flagset)
 	default:
 		help()
 	}
@@ -50,8 +47,8 @@ func help() {
 	fmt.Fprintf(os.Stderr, "commands:\n")
 	fmt.Fprintf(os.Stderr, "   get  retrieve the value of a key\n")
 	fmt.Fprintf(os.Stderr, "   set  set the value of a key\n")
-	fmt.Fprintf(os.Stderr, "   getplain  retrieve the value of a key that isn't encrypted\n")
-	fmt.Fprintf(os.Stderr, "   setplain  set the value of a key without encrypting the value\n")
+	fmt.Fprintf(os.Stderr, "\n\n")
+	fmt.Fprintf(os.Stderr, "-plaintext  don't encrypt or decrypt the values before storage or retrieval\n")
 
 	os.Exit(1)
 }
