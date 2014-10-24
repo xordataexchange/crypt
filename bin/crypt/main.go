@@ -35,6 +35,10 @@ func main() {
 		setCmd(flagset)
 	case "get":
 		getCmd(flagset)
+	case "setplain":
+		setPlainCmd(flagset)
+	case "getplain":
+		getPlainCmd(flagset)
 	default:
 		help()
 	}
@@ -46,5 +50,8 @@ func help() {
 	fmt.Fprintf(os.Stderr, "commands:\n")
 	fmt.Fprintf(os.Stderr, "   get  retrieve the value of a key\n")
 	fmt.Fprintf(os.Stderr, "   set  set the value of a key\n")
+	fmt.Fprintf(os.Stderr, "   getplain  retrieve the value of a key that isn't encrypted\n")
+	fmt.Fprintf(os.Stderr, "   setplain  set the value of a key without encrypting the value\n")
+
 	os.Exit(1)
 }

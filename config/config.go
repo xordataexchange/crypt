@@ -9,6 +9,7 @@ import (
 	"github.com/xordataexchange/crypt/backend/consul"
 	"github.com/xordataexchange/crypt/backend/etcd"
 	"github.com/xordataexchange/crypt/encoding/secconf"
+	"github.com/xordataexchange/crypt/encoding/standard"
 )
 
 // A ConfigManager retrieves and decrypts configuration from a key/value store.
@@ -22,7 +23,32 @@ type configManager struct {
 	store    backend.Store
 }
 
+type standardConfigManager struct {
+	store backend.Store
+}
+
+// NewStandardEtcdConfigManager returns a new ConfigManager backed by etcd.
+// Data will be base64 encoded but unencrypted.
+func NewStandardEtcdConfigManager(machines []string) (ConfigManager, error) {
+	store, err := etcd.New(machines)
+	if err != nil {
+		return nil, err
+	}
+	return standardConfigManager{store}, nil
+}
+
+// NewStandardConsulConfigManager returns a new ConfigManager backed by consul.
+// Data will be base64 encoded but unencrypted.
+func NewStandardConsulConfigManager(machines []string) (ConfigManager, error) {
+	store, err := consul.New(machines)
+	if err != nil {
+		return nil, err
+	}
+	return standardConfigManager{store}, nil
+}
+
 // NewEtcdConfigManager returns a new ConfigManager backed by etcd.
+// Data will be encrypted.
 func NewEtcdConfigManager(machines []string, keystore io.Reader) (ConfigManager, error) {
 	store, err := etcd.New(machines)
 	if err != nil {
@@ -57,6 +83,15 @@ func (c configManager) Get(key string) ([]byte, error) {
 	return secconf.Decode(value, bytes.NewBuffer(c.keystore))
 }
 
+// Get retrieves and decodes a value stored at key.
+func (c standardConfigManager) Get(key string) ([]byte, error) {
+	value, err := c.store.Get(key)
+	if err != nil {
+		return nil, err
+	}
+	return standard.Decode(value)
+}
+
 type Response struct {
 	Value []byte
 	Error error
@@ -76,6 +111,27 @@ func (c configManager) Watch(key string, stop chan bool) <-chan *Response {
 					continue
 				}
 				value, err := secconf.Decode(r.Value, bytes.NewBuffer(c.keystore))
+				resp <- &Response{value, err}
+			}
+		}
+	}()
+	return resp
+}
+
+func (c standardConfigManager) Watch(key string, stop chan bool) <-chan *Response {
+	resp := make(chan *Response, 0)
+	backendResp := c.store.Watch(key, stop)
+	go func() {
+		for {
+			select {
+			case <-stop:
+				return
+			case r := <-backendResp:
+				if r.Error != nil {
+					resp <- &Response{nil, r.Error}
+					continue
+				}
+				value, err := standard.Decode(r.Value)
 				resp <- &Response{value, err}
 			}
 		}
