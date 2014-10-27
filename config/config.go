@@ -5,8 +5,6 @@ import (
 	"io"
 	"io/ioutil"
 
-	"source.xordataexchange.com/exch/xor/Godeps/_workspace/src/github.com/xordataexchange/crypt/encoding/standard"
-
 	"github.com/xordataexchange/crypt/backend"
 	"github.com/xordataexchange/crypt/backend/consul"
 	"github.com/xordataexchange/crypt/backend/etcd"
@@ -132,8 +130,7 @@ func (c standardConfigManager) Watch(key string, stop chan bool) <-chan *Respons
 					resp <- &Response{nil, r.Error}
 					continue
 				}
-				value, err := standard.Decode(r.Value)
-				resp <- &Response{value, err}
+				resp <- &Response{r.Value, nil}
 			}
 		}
 	}()
