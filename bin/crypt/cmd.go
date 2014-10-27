@@ -106,11 +106,13 @@ func setCmd(flagset *flag.FlagSet) {
 	}
 
 	if plaintext {
+		fmt.Println("Operating without encryption.")
 		err := setPlain(key, backendStore, d)
 		if err != nil {
 			log.Fatal(err)
 			return
 		}
+		return
 	}
 	err = setEncrypted(key, keyring, d, backendStore)
 	if err != nil {
