@@ -12,7 +12,6 @@ import (
 	"github.com/xordataexchange/crypt/backend/consul"
 	"github.com/xordataexchange/crypt/backend/etcd"
 	"github.com/xordataexchange/crypt/encoding/secconf"
-	"github.com/xordataexchange/crypt/encoding/standard"
 )
 
 func getCmd(flagset *flag.FlagSet) {
@@ -72,11 +71,7 @@ func getPlain(key string, store backend.Store) ([]byte, error) {
 	if err != nil {
 		return value, err
 	}
-	value, err = standard.Decode(data)
-	if err != nil {
-		return value, err
-	}
-	return value, err
+	return data, err
 }
 
 func setCmd(flagset *flag.FlagSet) {
@@ -106,7 +101,6 @@ func setCmd(flagset *flag.FlagSet) {
 	}
 
 	if plaintext {
-		fmt.Println("Operating without encryption.")
 		err := setPlain(key, backendStore, d)
 		if err != nil {
 			log.Fatal(err)
@@ -122,11 +116,7 @@ func setCmd(flagset *flag.FlagSet) {
 
 }
 func setPlain(key string, store backend.Store, d []byte) error {
-	value, err := standard.Encode(d)
-	if err != nil {
-		return err
-	}
-	err = store.Set(key, value)
+	err := store.Set(key, d)
 	return err
 
 }

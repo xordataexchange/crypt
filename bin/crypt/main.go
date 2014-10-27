@@ -48,7 +48,7 @@ func help() {
 	fmt.Fprintf(os.Stderr, "commands:\n")
 	fmt.Fprintf(os.Stderr, "   get  retrieve the value of a key\n")
 	fmt.Fprintf(os.Stderr, "   set  set the value of a key\n")
-	fmt.Fprintf(os.Stderr, "\n\n")
+	fmt.Fprintf(os.Stderr, "\n")
 	fmt.Fprintf(os.Stderr, "-plaintext  don't encrypt or decrypt the values before storage or retrieval\n")
 
 	os.Exit(1)

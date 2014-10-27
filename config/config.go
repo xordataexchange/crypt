@@ -5,11 +5,12 @@ import (
 	"io"
 	"io/ioutil"
 
+	"source.xordataexchange.com/exch/xor/Godeps/_workspace/src/github.com/xordataexchange/crypt/encoding/standard"
+
 	"github.com/xordataexchange/crypt/backend"
 	"github.com/xordataexchange/crypt/backend/consul"
 	"github.com/xordataexchange/crypt/backend/etcd"
 	"github.com/xordataexchange/crypt/encoding/secconf"
-	"github.com/xordataexchange/crypt/encoding/standard"
 )
 
 // A ConfigManager retrieves and decrypts configuration from a key/value store.
@@ -28,7 +29,6 @@ type standardConfigManager struct {
 }
 
 // NewStandardEtcdConfigManager returns a new ConfigManager backed by etcd.
-// Data will be base64 encoded but unencrypted.
 func NewStandardEtcdConfigManager(machines []string) (ConfigManager, error) {
 	store, err := etcd.New(machines)
 	if err != nil {
@@ -38,7 +38,6 @@ func NewStandardEtcdConfigManager(machines []string) (ConfigManager, error) {
 }
 
 // NewStandardConsulConfigManager returns a new ConfigManager backed by consul.
-// Data will be base64 encoded but unencrypted.
 func NewStandardConsulConfigManager(machines []string) (ConfigManager, error) {
 	store, err := consul.New(machines)
 	if err != nil {
@@ -83,13 +82,15 @@ func (c configManager) Get(key string) ([]byte, error) {
 	return secconf.Decode(value, bytes.NewBuffer(c.keystore))
 }
 
-// Get retrieves and decodes a value stored at key.
+// Get retrieves a value stored at key.
+// convenience function, no additional value provided over
+// `etcdctl`
 func (c standardConfigManager) Get(key string) ([]byte, error) {
 	value, err := c.store.Get(key)
 	if err != nil {
 		return nil, err
 	}
-	return standard.Decode(value)
+	return value, err
 }
 
 type Response struct {
