@@ -95,8 +95,10 @@ func (c standardConfigManager) Get(key string) ([]byte, error) {
 // Set will put a key/value into the data store
 // and encode it with secconf
 func (c configManager) Set(key string, value []byte) error {
-	encodedValue, _ := secconf.Encode(value, bytes.NewBuffer(c.keystore))
-	err := c.store.Set(key, encodedValue)
+	encodedValue, err := secconf.Encode(value, bytes.NewBuffer(c.keystore))
+	if err == nil {
+		err = c.store.Set(key, encodedValue)
+	}
 	return err
 }
 
