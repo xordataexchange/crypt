@@ -14,6 +14,7 @@ import (
 // A ConfigManager retrieves and decrypts configuration from a key/value store.
 type ConfigManager interface {
 	Get(key string) ([]byte, error)
+	Set(key string, value []byte) error
 	Watch(key string, stop chan bool) <-chan *Response
 }
 
@@ -89,6 +90,18 @@ func (c standardConfigManager) Get(key string) ([]byte, error) {
 		return nil, err
 	}
 	return value, err
+}
+
+// Set will put a key/value into the data store
+func (c configManager) Set(key string, value []byte) error {
+	err := c.store.Set(key, value)
+	return err
+}
+
+// Set will put a key/value into the data store
+func (c standardConfigManager) Set(key string, value []byte) error {
+	err := c.store.Set(key, value)
+	return err
 }
 
 type Response struct {
