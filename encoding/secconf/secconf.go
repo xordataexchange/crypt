@@ -12,7 +12,7 @@ import (
 	"io"
 	"io/ioutil"
 
-	"code.google.com/p/go.crypto/openpgp"
+	"golang.org/x/crypto/openpgp"
 )
 
 // Deocde decodes data using the secconf codec.
