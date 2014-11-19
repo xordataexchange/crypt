@@ -12,21 +12,21 @@ var mockedStore map[string][]byte
 type Client struct{}
 
 func New(machines []string) (*Client, error) {
+	if mockedStore == nil {
+		mockedStore = make(map[string][]byte, 2)
+	}
 	return &Client{}, nil
 }
 
 func (c *Client) Get(key string) ([]byte, error) {
-	for k, v := range mockedStore {
-		if k == key {
-			return v, nil
-		}
+	if v, ok := mockedStore[key]; ok {
+		return v, nil
 	}
 	err := errors.New("Could not find key: " + key)
 	return nil, err
 }
 
 func (c *Client) Set(key string, value []byte) error {
-	mockedStore = make(map[string][]byte, 1)
 	mockedStore[key] = value
 	return nil
 }

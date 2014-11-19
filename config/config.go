@@ -132,13 +132,8 @@ func (c configManager) Watch(key string, stop chan bool) <-chan *Response {
 					resp <- &Response{nil, r.Error}
 					continue
 				}
-				// If there is no value length, there's nothing to decode
-				if len(r.Value) != 0 {
-					value, err := secconf.Decode(r.Value, bytes.NewBuffer(c.keystore))
-					resp <- &Response{value, err}
-				} else {
-					resp <- &Response{[]byte{}, nil}
-				}
+				value, err := secconf.Decode(r.Value, bytes.NewBuffer(c.keystore))
+				resp <- &Response{value, err}
 			}
 		}
 	}()

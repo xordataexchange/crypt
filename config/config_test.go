@@ -236,7 +236,7 @@ func Test_Get_AlternatePath_NoKey(t *testing.T) {
 }
 
 func Test_Watch_BasePath(t *testing.T) {
-	key := "foo"
+	key := "foo_enc"
 
 	store, err := mock.New([]string{})
 	if err != nil {
