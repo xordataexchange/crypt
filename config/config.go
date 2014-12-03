@@ -27,13 +27,26 @@ type standardConfigManager struct {
 	store backend.Store
 }
 
+func NewStandardConfigManager(client backend.Store) (ConfigManager, error) {
+	return standardConfigManager{client}, nil
+}
+
+func NewConfigManager(client backend.Store, keystore io.Reader) (ConfigManager, error) {
+	bytes, err := ioutil.ReadAll(keystore)
+	if err != nil {
+		return nil, err
+	}
+	return configManager{bytes, client}, nil
+}
+
 // NewStandardEtcdConfigManager returns a new ConfigManager backed by etcd.
 func NewStandardEtcdConfigManager(machines []string) (ConfigManager, error) {
 	store, err := etcd.New(machines)
 	if err != nil {
 		return nil, err
 	}
-	return standardConfigManager{store}, nil
+
+	return NewStandardConfigManager(store)
 }
 
 // NewStandardConsulConfigManager returns a new ConfigManager backed by consul.
@@ -42,7 +55,7 @@ func NewStandardConsulConfigManager(machines []string) (ConfigManager, error) {
 	if err != nil {
 		return nil, err
 	}
-	return standardConfigManager{store}, nil
+	return NewStandardConfigManager(store)
 }
 
 // NewEtcdConfigManager returns a new ConfigManager backed by etcd.
@@ -52,24 +65,17 @@ func NewEtcdConfigManager(machines []string, keystore io.Reader) (ConfigManager,
 	if err != nil {
 		return nil, err
 	}
-	bytes, err := ioutil.ReadAll(keystore)
-	if err != nil {
-		return nil, err
-	}
-	return configManager{bytes, store}, nil
+	return NewConfigManager(store, keystore)
 }
 
 // NewConsulConfigManager returns a new ConfigManager backed by consul.
+// Data will be encrypted.
 func NewConsulConfigManager(machines []string, keystore io.Reader) (ConfigManager, error) {
 	store, err := consul.New(machines)
 	if err != nil {
 		return nil, err
 	}
-	bytes, err := ioutil.ReadAll(keystore)
-	if err != nil {
-		return nil, err
-	}
-	return configManager{bytes, store}, nil
+	return NewConfigManager(store, keystore)
 }
 
 // Get retrieves and decodes a secconf value stored at key.
