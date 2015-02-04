@@ -74,6 +74,69 @@ func getPlain(key string, store backend.Store) ([]byte, error) {
 	return data, err
 }
 
+func listCmd(flagset *flag.FlagSet) {
+	flagset.Usage = func() {
+		fmt.Fprintf(os.Stderr, "usage: %s list [args...] key\n", os.Args[0])
+		flagset.PrintDefaults()
+	}
+	flagset.StringVar(&secretKeyring, "secret-keyring", ".secring.gpg", "path to armored secret keyring")
+	flagset.Parse(os.Args[2:])
+	key := flagset.Arg(0)
+	if key == "" {
+		flagset.Usage()
+		os.Exit(1)
+	}
+	backendStore, err := getBackendStore(backendName, endpoint)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if plaintext {
+		list, err := listPlain(key, backendStore)
+		if err != nil {
+			log.Fatal(err)
+		}
+		for _, kv := range list {
+			fmt.Printf("%s: %s", kv.Key, kv.Value)
+		}
+		return
+	}
+	list, err := listEncrypted(key, secretKeyring, backendStore)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+	for _, kv := range list {
+		fmt.Printf("%s: %s", kv.Key, kv.Value)
+	}
+}
+
+func listEncrypted(key, keyring string, store backend.Store) (backend.KVPairs, error) {
+	kr, err := os.Open(secretKeyring)
+	if err != nil {
+		return nil, err
+	}
+	defer kr.Close()
+	data, err := store.List(key)
+	if err != nil {
+		return nil, err
+	}
+	for i, kv := range data {
+		data[i].Value, err = secconf.Decode(kv.Value, kr)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return data, err
+}
+
+func listPlain(key string, store backend.Store) (backend.KVPairs, error) {
+	data, err := store.List(key)
+	if err != nil {
+		return nil, err
+	}
+	return data, err
+}
+
 func setCmd(flagset *flag.FlagSet) {
 	flagset.Usage = func() {
 		fmt.Fprintf(os.Stderr, "usage: %s set [args...] key file\n", os.Args[0])

@@ -38,6 +38,21 @@ func (c *Client) Get(key string) ([]byte, error) {
 	return kv.Value, nil
 }
 
+func (c *Client) List(key string) (backend.KVPairs, error) {
+	pairs, _, err := c.client.List(key, nil)
+	if err != nil {
+		return nil, err
+	}
+	if err != nil {
+		return nil, err
+	}
+	ret := make(backend.KVPairs, len(pairs), len(pairs))
+	for i, kv := range pairs {
+		ret[i] = &backend.KVPair{Key: kv.Key, Value: kv.Value}
+	}
+	return ret, nil
+}
+
 func (c *Client) Set(key string, value []byte) error {
 	key = strings.TrimPrefix(key, "/")
 	kv := &consulapi.KVPair{
