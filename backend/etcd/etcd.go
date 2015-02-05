@@ -26,14 +26,14 @@ func (c *Client) Get(key string) ([]byte, error) {
 	return []byte(resp.Node.Value), nil
 }
 
-func addKVPairs(node *goetcd.Node, list backend.KVPairs) {
+func addKVPairs(node *goetcd.Node, list backend.KVPairs) backend.KVPairs {
 	if node.Dir {
 		for _, n := range node.Nodes {
-			addKVPairs(n, list)
+			list = addKVPairs(n, list)
 		}
-	} else {
-		list = append(list, &backend.KVPair{Key: node.Key, Value: []byte(node.Value)})
+		return list
 	}
+	return append(list, &backend.KVPair{Key: node.Key, Value: []byte(node.Value)})
 }
 
 func (c *Client) List(key string) (backend.KVPairs, error) {
@@ -44,8 +44,7 @@ func (c *Client) List(key string) (backend.KVPairs, error) {
 	if !resp.Node.Dir {
 		return nil, errors.New("key is not a directory")
 	}
-	list := make(backend.KVPairs, 0)
-	addKVPairs(resp.Node, list)
+	list := addKVPairs(resp.Node, nil)
 	return list, nil
 }
 
