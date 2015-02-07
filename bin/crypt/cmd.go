@@ -111,18 +111,19 @@ func listCmd(flagset *flag.FlagSet) {
 }
 
 func listEncrypted(key, keyring string, store backend.Store) (backend.KVPairs, error) {
+	kr, err := os.Open(secretKeyring)
+	if err != nil {
+		return nil, err
+	}
+	defer kr.Close()
+
 	data, err := store.List(key)
 	if err != nil {
 		return nil, err
 	}
 	for i, kv := range data {
-		kr, err := os.Open(secretKeyring)
-		if err != nil {
-			return nil, err
-		}
-		defer kr.Close()
-
 		data[i].Value, err = secconf.Decode(kv.Value, kr)
+		kr.Seek(0, 0)
 		if err != nil {
 			return nil, err
 		}
