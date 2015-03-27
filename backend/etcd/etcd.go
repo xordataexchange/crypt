@@ -1,6 +1,7 @@
 package etcd
 
 import (
+	"errors"
 	"time"
 
 	"github.com/xordataexchange/crypt/backend"
@@ -23,6 +24,28 @@ func (c *Client) Get(key string) ([]byte, error) {
 		return nil, err
 	}
 	return []byte(resp.Node.Value), nil
+}
+
+func addKVPairs(node *goetcd.Node, list backend.KVPairs) backend.KVPairs {
+	if node.Dir {
+		for _, n := range node.Nodes {
+			list = addKVPairs(n, list)
+		}
+		return list
+	}
+	return append(list, &backend.KVPair{Key: node.Key, Value: []byte(node.Value)})
+}
+
+func (c *Client) List(key string) (backend.KVPairs, error) {
+	resp, err := c.client.Get(key, false, true)
+	if err != nil {
+		return nil, err
+	}
+	if !resp.Node.Dir {
+		return nil, errors.New("key is not a directory")
+	}
+	list := addKVPairs(resp.Node, nil)
+	return list, nil
 }
 
 func (c *Client) Set(key string, value []byte) error {

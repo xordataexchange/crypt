@@ -2,6 +2,8 @@ package mock
 
 import (
 	"errors"
+	"path"
+	"strings"
 	"time"
 
 	"github.com/xordataexchange/crypt/backend"
@@ -24,6 +26,17 @@ func (c *Client) Get(key string) ([]byte, error) {
 	}
 	err := errors.New("Could not find key: " + key)
 	return nil, err
+}
+
+func (c *Client) List(key string) (backend.KVPairs, error) {
+	var list backend.KVPairs
+	dir := path.Clean(key) + "/"
+	for k, v := range mockedStore {
+		if strings.HasPrefix(k, dir) {
+			list = append(list, &backend.KVPair{Key: k, Value: v})
+		}
+	}
+	return list, nil
 }
 
 func (c *Client) Set(key string, value []byte) error {

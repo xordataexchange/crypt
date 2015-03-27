@@ -37,6 +37,8 @@ func main() {
 		setCmd(flagset)
 	case "get":
 		getCmd(flagset)
+	case "list":
+		listCmd(flagset)
 	default:
 		help()
 	}
@@ -46,8 +48,9 @@ func help() {
 	fmt.Fprintf(os.Stderr, "usage: %s COMMAND [arg...]", os.Args[0])
 	fmt.Fprintf(os.Stderr, "\n\n")
 	fmt.Fprintf(os.Stderr, "commands:\n")
-	fmt.Fprintf(os.Stderr, "   get  retrieve the value of a key\n")
-	fmt.Fprintf(os.Stderr, "   set  set the value of a key\n")
+	fmt.Fprintf(os.Stderr, "   get   retrieve the value of a key\n")
+	fmt.Fprintf(os.Stderr, "   list  retrieve all values under a key\n")
+	fmt.Fprintf(os.Stderr, "   set   set the value of a key\n")
 	fmt.Fprintf(os.Stderr, "\n")
 	fmt.Fprintf(os.Stderr, "-plaintext  don't encrypt or decrypt the values before storage or retrieval\n")
 

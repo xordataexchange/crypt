@@ -11,16 +11,23 @@ import (
 	"github.com/xordataexchange/crypt/encoding/secconf"
 )
 
-// A ConfigManager retrieves and decrypts configuration from a key/value store.
-type ConfigManager interface {
-	Get(key string) ([]byte, error)
-	Set(key string, value []byte) error
-	Watch(key string, stop chan bool) <-chan *Response
+type KVPair struct {
+	backend.KVPair
 }
+
+type KVPairs []*KVPair
 
 type configManager struct {
 	keystore []byte
 	store    backend.Store
+}
+
+// A ConfigManager retrieves and decrypts configuration from a key/value store.
+type ConfigManager interface {
+	Get(key string) ([]byte, error)
+	List(key string) (KVPairs, error)
+	Set(key string, value []byte) error
+	Watch(key string, stop chan bool) <-chan *Response
 }
 
 type standardConfigManager struct {
@@ -96,6 +103,39 @@ func (c standardConfigManager) Get(key string) ([]byte, error) {
 		return nil, err
 	}
 	return value, err
+}
+
+// List retrieves and decodes all secconf value stored under key.
+func (c configManager) List(key string) (KVPairs, error) {
+	list, err := c.store.List(key)
+	retList := make(KVPairs, len(list))
+	if err != nil {
+		return nil, err
+	}
+	for i, kv := range list {
+		retList[i].Key = kv.Key
+		retList[i].Value, err = secconf.Decode(kv.Value, bytes.NewBuffer(c.keystore))
+		if err != nil {
+			return nil, err
+		}
+	}
+	return retList, nil
+}
+
+// List retrieves all values under key.
+// convenience function, no additional value provided over
+// `etcdctl`
+func (c standardConfigManager) List(key string) (KVPairs, error) {
+	list, err := c.store.List(key)
+	retList := make(KVPairs, len(list))
+	if err != nil {
+		return nil, err
+	}
+	for i, kv := range list {
+		retList[i].Key = kv.Key
+		retList[i].Value = kv.Value
+	}
+	return retList, err
 }
 
 // Set will put a key/value into the data store
