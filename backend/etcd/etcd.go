@@ -59,17 +59,18 @@ func (c *Client) Watch(key string, stop chan bool) <-chan *backend.Response {
 		for {
 			var resp *goetcd.Response
 			var err error
-			if c.waitIndex == 0 {
-				resp, err = c.client.Get(key, false, false)
-				if err != nil {
-					respChan <- &backend.Response{nil, err}
-					time.Sleep(time.Second * 5)
-					continue
-				}
-				c.waitIndex = resp.EtcdIndex
-				respChan <- &backend.Response{[]byte(resp.Node.Value), nil}
-			}
-			resp, err = c.client.Watch(key, c.waitIndex+1, false, nil, stop)
+			// if c.waitIndex == 0 {
+			// 	resp, err = c.client.Get(key, false, false)
+			// 	if err != nil {
+			// 		respChan <- &backend.Response{nil, err}
+			// 		time.Sleep(time.Second * 5)
+			// 		continue
+			// 	}
+			// 	c.waitIndex = resp.EtcdIndex
+			// 	respChan <- &backend.Response{[]byte(resp.Node.Value), nil}
+			// }
+			// resp, err = c.client.Watch(key, c.waitIndex+1, false, nil, stop)
+			resp, err = c.client.Watch(key, 0, false, nil, stop)
 			if err != nil {
 				respChan <- &backend.Response{nil, err}
 				time.Sleep(time.Second * 5)
