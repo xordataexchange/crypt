@@ -11,6 +11,7 @@ import (
 	"github.com/xordataexchange/crypt/backend"
 	"github.com/xordataexchange/crypt/backend/consul"
 	"github.com/xordataexchange/crypt/backend/etcd"
+	"github.com/xordataexchange/crypt/backend/zookeeper"
 	"github.com/xordataexchange/crypt/encoding/secconf"
 )
 
@@ -207,6 +208,8 @@ func getBackendStore(provider string, endpoint string) (backend.Store, error) {
 			endpoint = "127.0.0.1:8500"
 		case "etcd":
 			endpoint = "http://127.0.0.1:4001"
+		case "zookeeper":
+			endpoint = "127.0.0.1:2181"
 		}
 	}
 	machines := []string{endpoint}
@@ -215,6 +218,8 @@ func getBackendStore(provider string, endpoint string) (backend.Store, error) {
 		return etcd.New(machines)
 	case "consul":
 		return consul.New(machines)
+	case "zookeeper":
+		return zookeeper.New(machines)
 	default:
 		return nil, errors.New("invalid backend " + provider)
 	}
