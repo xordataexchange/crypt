@@ -6,20 +6,20 @@ import (
 
 	"github.com/xordataexchange/crypt/backend"
 
-	"github.com/armon/consul-api"
+	"github.com/hashicorp/consul/api"
 )
 
 type Client struct {
-	client    *consulapi.KV
+	client    *api.KV
 	waitIndex uint64
 }
 
 func New(machines []string) (*Client, error) {
-	conf := consulapi.DefaultConfig()
+	conf := api.DefaultConfig()
 	if len(machines) > 0 {
 		conf.Address = machines[0]
 	}
-	client, err := consulapi.NewClient(conf)
+	client, err := api.NewClient(conf)
 	if err != nil {
 		return nil, err
 	}
@@ -36,7 +36,7 @@ func (c *Client) Get(key string) ([]byte, error) {
 
 func (c *Client) Set(key string, value []byte) error {
 	key = strings.TrimPrefix(key, "/")
-	kv := &consulapi.KVPair{
+	kv := &api.KVPair{
 		Key:   key,
 		Value: value,
 	}
@@ -48,7 +48,7 @@ func (c *Client) Watch(key string, stop chan bool) <-chan *backend.Response {
 	respChan := make(chan *backend.Response, 0)
 	go func() {
 		for {
-			opts := consulapi.QueryOptions{
+			opts := api.QueryOptions{
 				WaitIndex: c.waitIndex,
 			}
 			keypair, meta, err := c.client.Get(key, &opts)
