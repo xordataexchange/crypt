@@ -1,4 +1,4 @@
-# crypt
+# crypt [![GoDoc](https://godoc.org/github.com/xordataexchange/crypt?status.svg)](https://godoc.org/github.com/xordataexchange/crypt) [![Go Report Card](https://goreportcard.com/badge/github.com/xordataexchange/crypt)](https://goreportcard.com/report/github.com/xordataexchange/crypt)
 
 You can use crypt as a command line tool or as a configuration library:
 
@@ -13,7 +13,7 @@ Watch Kelsey explain `crypt` in this quick 5 minute video:
 
 ## Generating gpg keys and keyrings
 
-The crypt cli and config package require gpg keyrings. 
+The crypt cli and config package require gpg keyrings.
 
 ### Create a key and keyring from a batch file
 
