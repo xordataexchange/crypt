@@ -29,7 +29,11 @@ func New(machines []string) (*Client, error) {
 }
 
 func (c *Client) Get(key string) ([]byte, error) {
-	resp, err := c.keysAPI.Get(context.TODO(), key, nil)
+	return c.GetWithContext(context.TODO(), key)
+}
+
+func (c *Client) GetWithContext(ctx context.Context, key string) ([]byte, error) {
+	resp, err := c.keysAPI.Get(ctx, key, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -47,7 +51,11 @@ func addKVPairs(node *goetcd.Node, list backend.KVPairs) backend.KVPairs {
 }
 
 func (c *Client) List(key string) (backend.KVPairs, error) {
-	resp, err := c.keysAPI.Get(context.TODO(), key, nil)
+	return c.ListWithContext(context.TODO(), key)
+}
+
+func (c *Client) ListWithContext(ctx context.Context, key string) (backend.KVPairs, error) {
+	resp, err := c.keysAPI.Get(ctx, key, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -59,15 +67,23 @@ func (c *Client) List(key string) (backend.KVPairs, error) {
 }
 
 func (c *Client) Set(key string, value []byte) error {
-	_, err := c.keysAPI.Set(context.TODO(), key, string(value), nil)
+	return c.SetWithContext(context.TODO(), key, value)
+}
+
+func (c *Client) SetWithContext(ctx context.Context, key string, value []byte) error {
+	_, err := c.keysAPI.Set(ctx, key, string(value), nil)
 	return err
 }
 
 func (c *Client) Watch(key string, stop chan bool) <-chan *backend.Response {
+	return c.WatchWithContext(context.Background(), key, stop)
+}
+
+func (c *Client) WatchWithContext(ctx context.Context, key string, stop chan bool) <-chan *backend.Response {
 	respChan := make(chan *backend.Response, 0)
 	go func() {
 		watcher := c.keysAPI.Watcher(key, nil)
-		ctx, cancel := context.WithCancel(context.Background())
+		ctx, cancel := context.WithCancel(ctx)
 		go func() {
 			<-stop
 			cancel()
