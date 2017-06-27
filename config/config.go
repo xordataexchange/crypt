@@ -8,6 +8,7 @@ import (
 	"github.com/xordataexchange/crypt/backend"
 	"github.com/xordataexchange/crypt/backend/consul"
 	"github.com/xordataexchange/crypt/backend/etcd"
+	"github.com/xordataexchange/crypt/backend/zookeeper"
 	"github.com/xordataexchange/crypt/encoding/secconf"
 )
 
@@ -65,6 +66,15 @@ func NewStandardConsulConfigManager(machines []string) (ConfigManager, error) {
 	return NewStandardConfigManager(store)
 }
 
+// NewStandardZookeeperConfigManager returns a new ConfigManager backed by zookeeper.
+func NewStandardZookeeperConfigManager(machines []string) (ConfigManager, error) {
+	store, err := zookeeper.New(machines)
+	if err != nil {
+		return nil, err
+	}
+	return NewStandardConfigManager(store)
+}
+
 // NewEtcdConfigManager returns a new ConfigManager backed by etcd.
 // Data will be encrypted.
 func NewEtcdConfigManager(machines []string, keystore io.Reader) (ConfigManager, error) {
@@ -79,6 +89,16 @@ func NewEtcdConfigManager(machines []string, keystore io.Reader) (ConfigManager,
 // Data will be encrypted.
 func NewConsulConfigManager(machines []string, keystore io.Reader) (ConfigManager, error) {
 	store, err := consul.New(machines)
+	if err != nil {
+		return nil, err
+	}
+	return NewConfigManager(store, keystore)
+}
+
+// NewZookeeperConfigManager returns a new ConfigManager backed by zookeeper.
+// Data will be encrypted.
+func NewZookeeperConfigManager(machines []string, keystore io.Reader) (ConfigManager, error) {
+	store, err := zookeeper.New(machines)
 	if err != nil {
 		return nil, err
 	}
