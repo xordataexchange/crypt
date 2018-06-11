@@ -43,9 +43,6 @@ func (c *Client) List(key string) (backend.KVPairs, error) {
 	if err != nil {
 		return nil, err
 	}
-	if err != nil {
-		return nil, err
-	}
 	ret := make(backend.KVPairs, len(pairs), len(pairs))
 	for i, kv := range pairs {
 		ret[i] = &backend.KVPair{Key: kv.Key, Value: kv.Value}
