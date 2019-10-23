@@ -5,7 +5,7 @@
 ### Binary release
 
 ```
-wget https://github.com/xordataexchange/crypt/releases/download/v0.0.1/crypt-0.0.1-linux-amd64
+wget https://github.com/bketelsen/crypt/releases/download/v0.0.1/crypt-0.0.1-linux-amd64
 mv crypt-0.0.1-linux-amd64 /usr/local/bin/crypt
 chmod +x /usr/local/bin/crypt
 ```
@@ -13,7 +13,7 @@ chmod +x /usr/local/bin/crypt
 ### go install
 
 ```
-go install github.com/xordataexchange/crypt/bin/crypt
+go install github.com/bketelsen/crypt/bin/crypt
 ```
 
 ## Backends

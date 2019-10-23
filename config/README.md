@@ -12,7 +12,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/xordataexchange/crypt/config"
+	"github.com/bketelsen/crypt/config"
 )
 
 var (
@@ -49,7 +49,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/xordataexchange/crypt/config"
+	"github.com/bketelsen/crypt/config"
 )
 
 var (

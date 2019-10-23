@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/xordataexchange/crypt/backend"
+	"github.com/bketelsen/crypt/backend"
 
 	"github.com/armon/consul-api"
 )
