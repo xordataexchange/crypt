@@ -1,6 +1,6 @@
 # crypt
 
-**This is a maintained fork of the abandoned [original](https://github.com/xordataexchange/crypt)**
+**This is a maintained fork of the abandoned [original](https://github.com/bketelsen/crypt)**
 
 You can use crypt as a command line tool or as a configuration library:
 

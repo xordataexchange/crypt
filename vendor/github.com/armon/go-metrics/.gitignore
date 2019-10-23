@@ -20,11 +20,5 @@ _cgo_export.*
 _testmain.go
 
 *.exe
-*.test
-*.prof
 
-.pubring.gpg
-.secring.gpg
-
-# Ignore JetBrains IDE Project Files
-.idea
+/metrics.out
