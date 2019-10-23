@@ -22,9 +22,3 @@ _testmain.go
 *.exe
 *.test
 *.prof
-
-.pubring.gpg
-.secring.gpg
-
-# Ignore JetBrains IDE Project Files
-.idea
