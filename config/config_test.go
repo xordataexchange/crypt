@@ -158,6 +158,38 @@ func Test_StandardGet_AlternatePath_NoKey(t *testing.T) {
 	}
 }
 
+func Test_StandardList_BasePath(t *testing.T) {
+	dir := "dir"
+	key := "dir/foo"
+	value := []byte("bar")
+
+	store, err := mock.New([]string{})
+	if err != nil {
+		t.Errorf("Error creating backend: %s\n", err.Error())
+	}
+	cm, err := NewStandardConfigManager(store)
+	if err != nil {
+		t.Errorf("Error creating config manager: %s\n", err.Error())
+	}
+	err = cm.Set(key, value)
+	if err != nil {
+		t.Errorf("Error adding key: %s\n", err.Error())
+	}
+	storedValue, err := cm.List(dir)
+	if err != nil {
+		t.Errorf("Error list dir: %s\n", err.Error())
+	}
+	if len(storedValue) == 0 {
+		t.Error("Empty list got on list directory")
+	}
+	if storedValue[0].Key != key {
+		t.Errorf("Keys did not match: %s vs %s", storedValue[0].Key, key)
+	}
+	if !reflect.DeepEqual(storedValue[0].Value, value) {
+		t.Errorf("Two values did not match: %+v vs %+v", storedValue[0].Value, value)
+	}
+}
+
 func Test_StandardWatch_BasePath(t *testing.T) {
 	key := "foo"
 
@@ -232,6 +264,38 @@ func Test_Get_AlternatePath_NoKey(t *testing.T) {
 	_, err = cm.Get(key)
 	if err == nil {
 		t.Errorf("Did not get expected error\n")
+	}
+}
+
+func Test_List_BasePath(t *testing.T) {
+	dir := "dir_enc"
+	key := "dir_enc/foo_enc"
+	value := []byte("bar_enc")
+
+	store, err := mock.New([]string{})
+	if err != nil {
+		t.Errorf("Error creating backend: %s\n", err.Error())
+	}
+	cm, err := NewConfigManager(store, bytes.NewBufferString(secring))
+	if err != nil {
+		t.Errorf("Error creating config manager: %s\n", err.Error())
+	}
+	err = cm.Set(key, value)
+	if err != nil {
+		t.Errorf("Error adding key: %s\n", err.Error())
+	}
+	storedValue, err := cm.List(dir)
+	if err != nil {
+		t.Errorf("Error list dir: %s\n", err.Error())
+	}
+	if len(storedValue) == 0 {
+		t.Error("Empty list got on list directory")
+	}
+	if storedValue[0].Key != key {
+		t.Errorf("Keys did not match: %s vs %s", storedValue[0].Key, key)
+	}
+	if !reflect.DeepEqual(storedValue[0].Value, value) {
+		t.Errorf("Two values did not match: %+v vs %+v", storedValue[0].Value, value)
 	}
 }
 
