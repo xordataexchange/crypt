@@ -113,6 +113,7 @@ func (c configManager) List(key string) (KVPairs, error) {
 		return nil, err
 	}
 	for i, kv := range list {
+		retList[i] = &KVPair{}
 		retList[i].Key = kv.Key
 		retList[i].Value, err = secconf.Decode(kv.Value, bytes.NewBuffer(c.keystore))
 		if err != nil {
@@ -132,8 +133,7 @@ func (c standardConfigManager) List(key string) (KVPairs, error) {
 		return nil, err
 	}
 	for i, kv := range list {
-		retList[i].Key = kv.Key
-		retList[i].Value = kv.Value
+		retList[i] = &KVPair{*kv}
 	}
 	return retList, err
 }
