@@ -4,7 +4,7 @@ go 1.12
 
 require (
 	cloud.google.com/go/firestore v1.1.0
-	github.com/coreos/etcd v3.3.13+incompatible
+	github.com/coreos/etcd v3.3.24+incompatible
 	github.com/coreos/go-semver v0.3.0 // indirect
 	github.com/google/btree v1.0.0 // indirect
 	github.com/hashicorp/consul/api v1.1.0
