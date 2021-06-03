@@ -8,7 +8,7 @@ import (
 
 	"github.com/bketelsen/crypt/backend"
 
-	goetcd "github.com/coreos/etcd/client"
+	goetcd "go.etcd.io/etcd/client/v2"
 )
 
 type Client struct {
