@@ -2,18 +2,8 @@
 
 ## Install
 
-### Binary release
-
-```
-wget https://github.com/bketelsen/crypt/releases/download/v0.0.1/crypt-0.0.1-linux-amd64
-mv crypt-0.0.1-linux-amd64 /usr/local/bin/crypt
-chmod +x /usr/local/bin/crypt
-```
-
-### go install
-
-```
-go install github.com/bketelsen/crypt/bin/crypt
+```bash
+go install github.com/bketelsen/crypt/bin/crypt@latest
 ```
 
 ## Backends
@@ -41,7 +31,7 @@ usage: crypt set [args...] key file
 
 Example:
 
-```
+```bash
 crypt set -keyring pubring.gpg /app/config config.json 
 ```
 
@@ -56,15 +46,17 @@ usage: crypt get [args...] key
 
 Example:
 
-```
+```bash
 crypt get -secret-keyring secring.gpg /app/config
 ```
 
 ### Support for unencrypted values
-```
+
+```bash
 crypt set -plaintext ...
 crypt get -plaintext ...
 ```
+
 Crypt now has support for getting and setting plain unencrypted values, as
 a convenience.  This was added to the backend libraries so it could be exposed
 in spf13/viper. Use the -plaintext flag to get or set a value without encryption. 

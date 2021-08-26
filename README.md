@@ -1,6 +1,6 @@
 # crypt
 
-**This is a maintained fork of the abandoned [original](https://github.com/bketelsen/crypt)**
+**This is a maintained fork of the abandoned [original](https://github.com/xordataexchange/crypt)**
 
 You can use crypt as a command line tool or as a configuration library:
 
@@ -19,7 +19,7 @@ The crypt cli and config package require gpg keyrings.
 
 ### Create a key and keyring from a batch file
 
-```
+```bash
 vim app.batch
 ```
 
@@ -39,7 +39,7 @@ Expire-Date: 0
 
 Run the following command:
 
-```
+```bash
 gpg2 --batch --armor --gen-key app.batch
 ```
 
