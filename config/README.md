@@ -4,7 +4,7 @@
 
 ### Get configuration from a backend
 
-```
+```go
 package main
 
 import (
@@ -41,7 +41,7 @@ func main() {
 
 ### Monitor backend for configuration changes
 
-```
+```go
 package main
 
 import (

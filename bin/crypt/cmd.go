@@ -48,7 +48,7 @@ func getCmd(flagset *flag.FlagSet) {
 
 func getEncrypted(key, keyring string, store backend.Store) ([]byte, error) {
 	var value []byte
-	kr, err := os.Open(secretKeyring)
+	kr, err := os.Open(keyring)
 	if err != nil {
 		return value, err
 	}
@@ -111,7 +111,7 @@ func listCmd(flagset *flag.FlagSet) {
 }
 
 func listEncrypted(key, keyring string, store backend.Store) (backend.KVPairs, error) {
-	kr, err := os.Open(secretKeyring)
+	kr, err := os.Open(keyring)
 	if err != nil {
 		return nil, err
 	}
