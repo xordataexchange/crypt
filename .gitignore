@@ -29,3 +29,6 @@ _testmain.go
 # Ignore JetBrains IDE Project Files
 .idea
 /crypt
+
+# goreleaser
+dist/
