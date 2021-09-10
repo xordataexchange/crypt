@@ -39,11 +39,18 @@ func getCmd(flagset *flag.FlagSet) {
 		return
 	}
 	value, err := getEncrypted(key, secretKeyring, backendStore)
-
 	if err != nil {
 		log.Fatal(err)
 	}
 	fmt.Printf("%s\n", value)
+}
+
+func versionCmd(flagset *flag.FlagSet, ver string) {
+	flagset.Usage = func() {
+		fmt.Fprintf(os.Stderr, "usage: %s version\n", os.Args[0])
+		flagset.PrintDefaults()
+	}
+	fmt.Println(ver)
 }
 
 func getEncrypted(key, keyring string, store backend.Store) ([]byte, error) {
@@ -62,7 +69,6 @@ func getEncrypted(key, keyring string, store backend.Store) ([]byte, error) {
 		return value, err
 	}
 	return value, err
-
 }
 
 func getPlain(key string, store backend.Store) ([]byte, error) {
@@ -101,7 +107,6 @@ func listCmd(flagset *flag.FlagSet) {
 		return
 	}
 	list, err := listEncrypted(key, secretKeyring, backendStore)
-
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -178,12 +183,11 @@ func setCmd(flagset *flag.FlagSet) {
 		log.Fatal(err)
 	}
 	return
-
 }
+
 func setPlain(key string, store backend.Store, d []byte) error {
 	err := store.Set(key, d)
 	return err
-
 }
 
 func setEncrypted(key, keyring string, d []byte, store backend.Store) error {

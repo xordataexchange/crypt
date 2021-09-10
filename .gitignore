@@ -32,3 +32,6 @@ _testmain.go
 
 # goreleaser
 dist/
+
+# coverage
+coverage.txt
